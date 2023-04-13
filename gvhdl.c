@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "cJSON/cJSON.h"
 
 /*******************************************
     Some definitions
@@ -12,7 +13,8 @@
     Prototypes
 *******************************************/
 char *replace_substring(const char *str, const char *old_substring, const char *new_substring);
-char print_main_menu(char *file_name);
+unsigned char print_main_menu(char *file_name, cJSON *fpga_kits);
+cJSON *parse_json_file(const char *filename);
 
 /*******************************************
     main
@@ -23,7 +25,7 @@ int main(int argc, char *argv[]) {
     char buffer[BUFFER_SIZE];       // Buffer to read lines
     char *lines[24];
     unsigned int line = 0;
-    char option;
+    unsigned char option;
     
 
     // Check if the correct number of arguments has been provided
@@ -36,8 +38,11 @@ int main(int argc, char *argv[]) {
     entity = argv[1];
     architecture = argv[2];
 
+    // Parse JSON file and extract FPGA kit information
+    cJSON *fpga_kits = parse_json_file("fpga_kits.json");
+
     // Menu
-    option = print_main_menu(entity);
+    option = print_main_menu(entity, fpga_kits);
     while (1){
         switch (option){
         case 1: // Create file
@@ -81,7 +86,7 @@ int main(int argc, char *argv[]) {
     }
     
         
-
+    cJSON_Delete(fpga_kits);
     return 0;
 }
 
@@ -127,21 +132,62 @@ char *replace_substring(const char *str, const char *old_substring, const char *
     The print_main_menu function prints the menu, reads the user input, and validates if the chosen option is between 1 and 4. If the option is invalid, the user will be prompted to enter again until a valid option is selected. The function returns the value of the chosen option as a char.
 
 */
-char print_main_menu(char *file_name){
-    int choice;
+unsigned char print_main_menu(char *file_name, cJSON *fpga_kits) {
+    unsigned char choice;
 
     printf("\nMenu:\n");
     printf("1. Done! create file %s.vhd.\n", file_name);
-    printf("2. Kit DE10 Lite interfaces.\n");
-    printf("3. Show template.\n");
-    printf("4. Cancel and quit.\n");
-    printf("Enter the number of the chosen option: ");
-    scanf("%d", &choice);
-
-    while (choice < 1 || choice > 4) {
-        printf("Invalid option. Please, enter again: ");
-        scanf("%d", &choice);
+    
+    // Display FPGA kits from JSON data
+    cJSON *kit = NULL;
+    cJSON_ArrayForEach(kit, fpga_kits) {
+        printf("%d. %s\n", kit->valueint, kit->string);
     }
 
-    return (char)choice;
+    printf("%d. Show template.\n", cJSON_GetArraySize(fpga_kits) + 1);
+    printf("%d. Cancel and quit.\n", cJSON_GetArraySize(fpga_kits) + 2);
+    printf("Enter the number of the chosen option: ");
+    scanf("%c", &choice);
+
+    while (choice < 1 || choice > cJSON_GetArraySize(fpga_kits) + 2) {
+        printf("Invalid option. Please, enter again: ");
+        scanf("%c", &choice);
+    }
+
+    return choice;
+}
+
+/*  *parse_json_file
+    function to parse the JSON file and extract FPGA kits information
+*/
+cJSON *parse_json_file(const char *filename) {
+    cJSON *json_data = NULL;
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL) {
+        printf("Error opening the file '%s'.\n", filename);
+        exit(EXIT_FAILURE);
+    }
+
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char *data = (char *)malloc(length + 1);
+    if (data == NULL) {
+        printf("Error allocating memory.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    fread(data, 1, length, file);
+    fclose(file);
+    data[length] = '\0';
+
+    json_data = cJSON_Parse(data);
+    if (json_data == NULL) {
+        printf("Error parsing JSON data.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    free(data);
+    return json_data;
 }

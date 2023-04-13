@@ -1,0 +1,54 @@
+{
+    "kits": [
+      {
+        "name": "Kit DE10 Lite",
+        "interfaces": [
+          {
+            "name": "GPIO",
+            "pinout": [
+              {"pin": "PIN_A1", "name": "GPIO_0"},
+              {"pin": "PIN_A2", "name": "GPIO_1"},
+              {"pin": "PIN_A3", "name": "GPIO_2"}
+            ]
+          },
+          {
+            "name": "UART",
+            "pinout": [
+              {"pin": "PIN_B1", "name": "UART_TX"},
+              {"pin": "PIN_B2", "name": "UART_RX"}
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Kit DE10 Standard",
+        "interfaces": [
+          {
+            "name": "GPIO",
+            "pinout": [
+              {"pin": "PIN_C1", "name": "GPIO_0"},
+              {"pin": "PIN_C2", "name": "GPIO_1"},
+              {"pin": "PIN_C3", "name": "GPIO_2"}
+            ]
+          },
+          {
+            "name": "UART",
+            "pinout": [
+              {"pin": "PIN_D1", "name": "UART_TX"},
+              {"pin": "PIN_D2", "name": "UART_RX"}
+            ]
+          },
+          {
+            "name": "SPI",
+            "pinout": [
+              {"pin": "PIN_E1", "name": "SPI_SCK"},
+              {"pin": "PIN_E2", "name": "SPI_MISO"},
+              {"pin": "PIN_E3", "name": "SPI_MOSI"},
+              {"pin": "PIN_E4", "name": "SPI_CS"}
+            ]
+          }
+        ]
+      }
+    ]
+  }
+  
