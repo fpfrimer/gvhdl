@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -IcJSON
 
 # Source files
-SRCS = gvhdl.c cJSON/cJSON.c
+SRCS = gvhdl.c utilities.c cJSON/cJSON.c
 OBJS = $(SRCS:.c=.o)
 
 # Name of the executable
